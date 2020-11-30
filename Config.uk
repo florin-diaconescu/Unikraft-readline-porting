@@ -1,0 +1,9 @@
+config LIBREADLINE
+	bool "readline"
+	default n
+	select LIBNOLIBC if !HAVE_LIBC
+	select LIBUKDEBUG
+	select LIBUKALLOC
+
+if LIBREADLINE
+endif
