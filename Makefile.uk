@@ -1,0 +1,131 @@
+#  SPDX-License-Identifier: BSD-3-Clause
+#
+#  readline Makefile.uk
+#
+#  Authors: Florin Diaconescu <florin.diaconescu@stud.acs.upb.ro>
+#
+#  Copyright (c) 2020, University Politehnica of Bucharest. All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions
+#  are met:
+#
+#  1. Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#  2. Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution.
+#  3. Neither the name of the copyright holder nor the names of its
+#     contributors may be used to endorse or promote products derived from
+#     this software without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+#  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+#  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+#  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+#  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+#  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+#  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+#  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+#  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#  POSSIBILITY OF SUCH DAMAGE.
+#
+
+################################################################################
+# Library registration
+################################################################################
+$(eval $(call addlib_s,libreadline,$(CONFIG_LIBREADLINE)))
+
+################################################################################
+# Original sources
+################################################################################
+LIBREADLINE_VERSION = 8.0
+LIBREADLINE_URL = https://ftp.gnu.org/pub/gnu/readline/readline-$(LIBREADLINE_VERSION).tar.gz
+LIBREADLINE_SUBDIR = readline-$(LIBREADLINE_VERSION)
+$(eval $(call fetch,libreadline,$(LIBREADLINE_URL)))
+
+# LIBREADLINE_PATCHDIR=$(LIBREADLINE_BASE)/patches
+# $(eval $(call patch,libtasn1,$(LIBREADLINE_PATCHDIR),$(LIBREADLINE_SUBDIR)))
+
+################################################################################
+# Helpers
+################################################################################
+LIBREADLINE_EXTRACTED = $(LIBREADLINE_ORIGIN)/readline-$(LIBREADLINE_VERSION)
+
+################################################################################
+# Library includes
+################################################################################
+LIBREADLINE_COMMON_INCLUDES-y += -I$(LIBREADLINE_EXTRACTED)
+
+CINCLUDES-$(CONFIG_LIBREADLINE)   += $(LIBREADLINE_COMMON_INCLUDES-y)
+CXXINCLUDES-$(CONFIG_LIBREADLINE) += $(LIBREADLINE_COMMON_INCLUDES-y)
+
+LIBREADLINE_CINCLUDES   += -I$(LIBREADLINE_EXTRACTED)
+LIBREADLINE_CXXINCLUDES += -I$(LIBREADLINE_EXTRACTED)
+
+################################################################################
+# Global flags
+################################################################################
+#LIBREADLINE_DEFINES	+= -DHAVE_STRING_H -DHAVE_STDLIB_H -DHAVE_PWD_H -DHAVE_DIRENT_H
+#LIBREADLINE_DEFINES	+= -DHAVE_LOCALE_H -DTERMIOS_TTY_DRIVER -UNEW_TTY_DRIVER -DHAVE_UNISTD_H
+#LIBREADLINE_DEFINES	+= -DPREFER_STDARG -DUSE_VARARGS -DREAD
+LIBREADLINE_DEFINES	+= -DHAVE_CONFIG_H
+LIBREADLINE_CFLAGS-y	+= $(LIBREADLINE_DEFINES)
+LIBREADLINE_CXXFLAGS-y	+= $(LIBREADLINE_DEFINES)
+
+################################################################################
+# readline code
+################################################################################
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/bind.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/callback.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/colors.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/compat.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/complete.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/display.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/emacs_keymap.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/funmap.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/histexpand.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/histfile.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/history.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/histsearch.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/input.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/isearch.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/keymaps.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/kill.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/macro.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/mbutil.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/misc.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/nls.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/parens.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/parse-colors.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/readline.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/rltty.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/savestring.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/search.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/shell.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/signals.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/terminal.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/text.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/tilde.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/undo.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/util.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/vi_keymap.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/vi_mode.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/xfree.c
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/xmalloc.c
+
+################################################################################
+# readline prepare
+##############################################################################
+# Run ./configure
+$(LIBREADLINE_EXTRACTED)/config.status: $(LIBREADLINE_BUILD)/.origin
+	$(call verbose_cmd,CONFIG,libreadline: $(notdir $@), \
+		cd $(LIBREADLINE_EXTRACTED) && ./configure)
+
+LIBREADLINE_PREPARED_DEPS = \
+	$(LIBREADLINE_EXTRACTED)/config.status \
+
+$(LIBREADLINE_BUILD)/.prepared: $(LIBREADLINE_PREPARED_DEPS)
+
+UK_PREPARE += $(LIBREADLINE_BUILD)/.prepared
