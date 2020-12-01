@@ -67,9 +67,13 @@ LIBREADLINE_CXXINCLUDES += -I$(LIBREADLINE_EXTRACTED)
 ################################################################################
 # Global flags
 ################################################################################
-#LIBREADLINE_DEFINES	+= -DHAVE_STRING_H -DHAVE_STDLIB_H -DHAVE_PWD_H -DHAVE_DIRENT_H
-#LIBREADLINE_DEFINES	+= -DHAVE_LOCALE_H -DTERMIOS_TTY_DRIVER -UNEW_TTY_DRIVER -DHAVE_UNISTD_H
-#LIBREADLINE_DEFINES	+= -DPREFER_STDARG -DUSE_VARARGS -DREAD
+# Supress flags
+LIBREADLINE_SUPRESS_FLAGS += -Wno-unused-parameter -Wno-parentheses -Wno-sign-compare \
+                             -Wno-type-limits -Wno-unused-variable
+LIBREADLINE_CFLAGS-y    += $(LIBREADLINE_SUPRESS_FLAGS)
+LIBREADLINE_CXXFLAGS-y  += $(LIBREADLINE_SUPRESS_FLAGS)
+
+# Preprocessing symbols
 LIBREADLINE_DEFINES	+= -DHAVE_CONFIG_H
 LIBREADLINE_CFLAGS-y	+= $(LIBREADLINE_DEFINES)
 LIBREADLINE_CXXFLAGS-y	+= $(LIBREADLINE_DEFINES)
