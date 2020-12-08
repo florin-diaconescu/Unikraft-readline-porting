@@ -69,25 +69,28 @@ LIBREADLINE_CXXINCLUDES += -I$(LIBREADLINE_EXTRACTED)
 ################################################################################
 # Supress flags
 LIBREADLINE_SUPRESS_FLAGS += -Wno-unused-parameter -Wno-parentheses -Wno-sign-compare \
-                             -Wno-type-limits -Wno-unused-variable
+                             -Wno-type-limits -Wno-unused-variable -Wno-unused-but-set-variable \
+							 -Wno-unused-function -Wno-unused-label
 LIBREADLINE_CFLAGS-y    += $(LIBREADLINE_SUPRESS_FLAGS)
 LIBREADLINE_CXXFLAGS-y  += $(LIBREADLINE_SUPRESS_FLAGS)
 
 # Preprocessing symbols
 LIBREADLINE_DEFINES	+= -DHAVE_CONFIG_H
-LIBREADLINE_CFLAGS-y	+= $(LIBREADLINE_DEFINES)
-LIBREADLINE_CXXFLAGS-y	+= $(LIBREADLINE_DEFINES)
+LIBREADLINE_CFLAGS-y	+= $(LIBREADLINE_DEFINES) -D_POSIX_VERSION
+LIBREADLINE_CXXFLAGS-y	+= $(LIBREADLINE_DEFINES) -D_POSIX_VERSION
 
 ################################################################################
 # readline code
 ################################################################################
+LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/readline.c
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/bind.c
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/callback.c
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/colors.c
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/compat.c
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/complete.c
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/display.c
-LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/emacs_keymap.c
+#LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/emacs_keymap.c
+LIBREADLINE_EMACS_KEYMAP_FLAGS-y += -DREADLINE_LIBRARY
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/funmap.c
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/histexpand.c
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/histfile.c
@@ -103,8 +106,9 @@ LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/misc.c
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/nls.c
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/parens.c
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/parse-colors.c
-LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/readline.c
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/rltty.c
+LIBREADLINE_RLTTY_FLAGS-y += -DTERMIOS_TTY_DRIVER
+LIBREADLINE_RLTTY_FLAGS-y += -UNEW_TTY_DRIVER
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/savestring.c
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/search.c
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/shell.c
@@ -112,20 +116,31 @@ LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/signals.c
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/terminal.c
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/text.c
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/tilde.c
+LIBREADLINE_TILDE_FLAGS-y += -DREADLINE_LIBRARY
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/undo.c
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/util.c
-LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/vi_keymap.c
+#LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/vi_keymap.c
+LIBREADLINE_VI_KEYMAP_FLAGS-y += -DREADLINE_LIBRARY
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/vi_mode.c
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/xfree.c
 LIBREADLINE_SRCS-y += $(LIBREADLINE_EXTRACTED)/xmalloc.c
 
 ################################################################################
 # readline prepare
-##############################################################################
+################################################################################
 # Run ./configure
 $(LIBREADLINE_EXTRACTED)/config.status: $(LIBREADLINE_BUILD)/.origin
 	$(call verbose_cmd,CONFIG,libreadline: $(notdir $@), \
-		cd $(LIBREADLINE_EXTRACTED) && ./configure)
+		cd $(LIBREADLINE_EXTRACTED) && ./configure && \
+		sed -e "s/#define HAVE_POSIX_SIGSETJMP 1/\/\* #undef HAVE_POSIX_SIGSETJMP \*\//" config.h > \
+		config.temp && mv config.temp config.h && \
+		sed -e "s/#define HAVE_TERMCAP_H 1/\/\* #undef HAVE_TERMCAP_H \*\//" config.h > \
+		config.temp && mv config.temp config.h && \
+		sed -e "s/#define HAVE_TERMIO_H 1/\/\* #undef HAVE_TERMIO_H \*\//" config.h > \
+		config.temp && mv config.temp config.h && \
+		sed -e "s/#define HAVE_TERMIOS_H 1/\/\* #undef HAVE_TERMIOS_H \*\//" config.h > \
+		config.temp && mv config.temp config.h && \
+		echo "#undef NCURSES_VERSION" >> config.h)
 
 LIBREADLINE_PREPARED_DEPS = \
 	$(LIBREADLINE_EXTRACTED)/config.status \
